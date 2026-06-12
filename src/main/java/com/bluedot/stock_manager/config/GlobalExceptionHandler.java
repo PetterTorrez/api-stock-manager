@@ -3,6 +3,7 @@ package com.bluedot.stock_manager.config;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -79,6 +80,18 @@ public class GlobalExceptionHandler {
         .message(
           "The parameter provided is invalid or has an incorrect format."
         )
+        .build()
+    );
+  }
+
+  @ExceptionHandler(AuthorizationDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAuthorizationDenied(
+    AuthorizationDeniedException ex
+  ) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+      ErrorResponse.builder()
+        .error("Access Denied")
+        .message("You do not have permission to access this resource.")
         .build()
     );
   }

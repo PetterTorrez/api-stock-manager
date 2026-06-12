@@ -50,6 +50,16 @@ public class JwtService {
     return extractAllClaims(token).get("role", String.class);
   }
 
+  public boolean isTokenValid(String token, String username) {
+    final String extractedUsername = extractEmailFromToken(token);
+
+    return extractedUsername.equals(username) && !isTokenExpired(token);
+  }
+
+  private boolean isTokenExpired(String token) {
+    return extractAllClaims(token).getExpiration().before(new Date());
+  }
+
   private Key getSignKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
