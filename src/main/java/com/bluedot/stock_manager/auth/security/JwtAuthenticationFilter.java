@@ -1,6 +1,5 @@
 package com.bluedot.stock_manager.auth.security;
 
-import com.bluedot.stock_manager.auth.service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
-  private final CustomUserDetailsService userDetailsService;
 
   @Override
   protected void doFilterInternal(
@@ -32,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     FilterChain filterChain
   ) throws ServletException, IOException {
     final String authHeader = request.getHeader("Authorization");
-    final Boolean isAuthPath = request.getRequestURI().startsWith("/api/auth/");
+    final Boolean isAuthPath = request.getRequestURI().startsWith("/auth/");
 
     if (isAuthPath || authHeader == null || !authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
@@ -43,18 +40,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     try {
       String email = jwtService.extractEmailFromToken(jwt);
+      Long userId = jwtService.extractUserIdFromToken(jwt);
       String role = jwtService.extractRoleFromToken(jwt);
 
       if (
         email != null &&
         SecurityContextHolder.getContext().getAuthentication() == null
       ) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-        if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+        if (jwtService.isTokenValid(jwt, email)) {
           UsernamePasswordAuthenticationToken authToken =
             new UsernamePasswordAuthenticationToken(
-              email,
+              userId,
               null,
               Collections.singletonList(new SimpleGrantedAuthority(role))
             );
