@@ -2,6 +2,8 @@ package com.bluedot.stock_manager.auth.controller;
 
 import com.bluedot.stock_manager.auth.dto.AuthRequestDTO;
 import com.bluedot.stock_manager.auth.dto.AuthResponseDTO;
+import com.bluedot.stock_manager.auth.dto.LoginRequestDTO;
+import com.bluedot.stock_manager.auth.dto.LoginResponseDTO;
 import com.bluedot.stock_manager.auth.service.AuthService;
 import com.bluedot.stock_manager.config.ApiResponse;
 import jakarta.validation.Valid;
@@ -33,6 +35,22 @@ public class AuthController {
         .success(true)
         .message("User created successfully")
         .data(userResponse)
+        .status(HttpStatus.OK.value())
+        .build()
+    );
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<ApiResponse<LoginResponseDTO>> authenticate(
+    @RequestBody LoginRequestDTO dto
+  ) {
+    LoginResponseDTO responseDTO = this.authService.authenticate(dto);
+
+    return ResponseEntity.ok(
+      ApiResponse.<LoginResponseDTO>builder()
+        .success(true)
+        .message("User logged in successfully")
+        .data(responseDTO)
         .status(HttpStatus.OK.value())
         .build()
     );
