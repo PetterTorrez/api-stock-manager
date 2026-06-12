@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
       ErrorResponse.builder()
         .error("Invalid Parameter Format")
         .message(
-          "El parámetro proporcionado es inválido o tiene un formato incorrecto."
+          "The parameter provided is invalid or has an incorrect format."
         )
         .build()
     );
