@@ -1,5 +1,6 @@
 package com.bluedot.stock_manager.product.dto;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,6 +28,10 @@ public class ProductRequestDTO {
 
   @NotNull(message = "Price is required ")
   @Positive(message = "Price must be greater than zero")
+  @DecimalMax(
+    value = "999999.99",
+    message = "Price exceeds maximum allowed value"
+  )
   private Double price;
 
   @Size(max = 900, message = "Description must be less than 900 characters")
